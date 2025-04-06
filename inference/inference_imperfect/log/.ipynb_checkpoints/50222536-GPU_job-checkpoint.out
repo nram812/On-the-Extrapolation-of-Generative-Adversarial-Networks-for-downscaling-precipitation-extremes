@@ -1,0 +1,31 @@
+Have a good day, Laura!
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) XALT/minimal   2) slurm   3) NeSI
+processing data from /nesi/nobackup/niwa00018/morrishdg/Downscaled_Preprocessed/CMIP/CSIRO-ARCCSS/ACCESS-CM2/historical/r4i1p1f1/day/CMIP_CSIRO-ARCCSS_ACCESS-CM2_historical_r4i1p1f1_day*.nc to 
+2025-01-22 22:00:13.868952: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-01-22 22:00:18.535281: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+2025-01-22 22:00:26.606155: I tensorflow/core/common_runtime/gpu/gpu_device.cc:1639] Created device /job:localhost/replica:0/task:0/device:GPU:0 with 79086 MB memory:  -> device: 0, name: NVIDIA A100-SXM4-80GB, pci bus id: 0000:41:00.0, compute capability: 8.0
+WARNING:tensorflow:No training configuration found in the save file, so the model was *not* compiled. Compile it manually.
+WARNING:tensorflow:No training configuration found in the save file, so the model was *not* compiled. Compile it manually.
+BEGINNING EMULATOR DOWNSCALING
+Variable: pr
+LOAD ML MODEL
+
+
+PREP INPUT
+	- processing GCM input data
+		- unstacking pressure levels
+		- normalizing by mean and standard deviation
+		- concatenating variables to channel dimension
+	- processing mean, variance, and time data
+	- processing static fields
+	- calculating time of year array
+PREP OUTPUT
+	- initializing output data structure
+APPLY ML MODEL
+Predicting:   0%|                                                                                                                                                         | 0/370 [00:00<?, ?batch/s]2025-01-22 22:00:55.546828: I tensorflow/compiler/xla/stream_executor/cuda/cuda_blas.cc:606] TensorFloat-32 will be used for the matrix multiplication. This will only be logged once.
+2025-01-22 22:00:55.865990: I tensorflow/compiler/xla/stream_executor/cuda/cuda_dnn.cc:432] Loaded cuDNN version 8600
+Predicting:   0%|▍                                                                                                                                              | 1/370 [00:31<3:14:45, 31.67s/batch]Predicting:   1%|▊                                                                                                                                              | 2/370 [00:42<1:58:57, 19.39s/batch]Predicting:   1%|█▏                                                                                                                                             | 3/370 [00:53<1:34:47, 15.50s/batch]Predicting:   1%|█▌                                                                                                                                             | 4/370 [01:04<1:23:10, 13.63s/batch]Predicting:   1%|█▉                                                                                                                                             | 5/370 [01:14<1:16:43, 12.61s/batch]Predicting:   2%|██▎                                                                                                                                            | 6/370 [01:26<1:13:29, 12.11s/batch]Predicting:   2%|██▋                                                                                                                                            | 7/370 [01:37<1:12:13, 11.94s/batch]Predicting:   2%|███                                                                                                                                            | 8/370 [01:48<1:09:42, 11.55s/batch]Predicting:   2%|███▍                                                                                                                                           | 9/370 [01:59<1:08:04, 11.31s/batch]Predicting:   3%|███▊                                                                                                                                          | 10/370 [02:15<1:17:48, 12.97s/batch]Predicting:   3%|████▏                                                                                                                                         | 11/370 [02:26<1:13:36, 12.30s/batch]Predicting:   3%|████▌                                                                                                                                         | 12/370 [02:37<1:10:38, 11.84s/batch]Predicting:   4%|████▉                                                                                                                                         | 13/370 [02:48<1:08:43, 11.55s/batch]Predicting:   4%|█████▎                                                                                                                                        | 14/370 [02:59<1:07:17, 11.34s/batch]Predicting:   4%|█████▊                                                                                                                                        | 15/370 [03:09<1:06:02, 11.16s/batch]Predicting:   4%|██████▏                                                                                                                                       | 16/370 [03:20<1:05:12, 11.05s/batch]Predicting:   5%|██████▌                                                                                                                                       | 17/370 [03:31<1:04:40, 10.99s/batch]Predicting:   5%|██████▉                                                                                                                                       | 18/370 [03:42<1:04:57, 11.07s/batch]Predicting:   5%|███████▎                                                                                                                                      | 19/370 [03:53<1:04:24, 11.01s/batch]slurmstepd: error: *** JOB 50222536 ON wmg101 CANCELLED AT 2025-01-22T22:04:38 ***

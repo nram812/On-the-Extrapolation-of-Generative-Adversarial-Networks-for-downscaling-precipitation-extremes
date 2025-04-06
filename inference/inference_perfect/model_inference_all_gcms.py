@@ -17,19 +17,22 @@ import pandas as pd
 import sys
 # Please make sure that this path is the directory of the repository
 # or os.chdir(/path/of/repository)
-sys.path.append(os.getcwd())
-from src.layers import *
-from src.models import *
-from src.gan import *
-from src.src_eval_inference import *
+#sys.path.append(os.getcwd())
+os.chdir(r'/nesi/project/niwa00018/ML_downscaling_CCAM/On-the-Extrapolation-of-Generative-Adversarial-Networks-for-downscaling-precipitation-extremes')
+sys.path.append(r'/nesi/project/niwa00018/ML_downscaling_CCAM/On-the-Extrapolation-of-Generative-Adversarial-Networks-for-downscaling-precipitation-extremes/src/')
+from layers import *
+from models import *
+from gan import *
+from src_eval_inference import *
 config_file = sys.argv[-1]
 # please note this is the config file for the "model"
-
+output_norm =1
+# not used but note
 # config_file = r'./experiment_configs/Hist_vs_future_runs/historical.json'
 # When you run the inference in python, you need to specify the experiment
 # i.e. python model_inference.py /path/to/config/file
 # see the slurm script for more information on how to run this experiment
-config_file_for_test_data = r'./model_inference/metadata_all_gcms.json'
+config_file_for_test_data = r'./model_inference/metadata_all_gcms_v2.json'
 # you may want to change directory to the repo-path i.e. os.chdir(/your/path/to/repo)
 with open(config_file) as f:
     config = json.load(f)
@@ -43,7 +46,7 @@ quantiles = [ 0.5 , 0.7, 0.9, 0.925,
 # the periods of which the climate change signal / response is computed over
 historical_period = slice("1985","2014")
 future_period = slice("2070","2099")
-
+future_period2 = slice("2040","2069")
 
 def compute_quantiles(df,quantiles, period):
     df = df.sel(time = period)
@@ -85,37 +88,58 @@ for gcm in stacked_X.GCM.values:
     print(f"prepraring data fpr a GCM {gcm}")
     output_shape = create_output(stacked_X, y)
     output_shape.pr.values = output_shape.pr.values * 0.0
+    
+    # normalization is now with a 1
     output_hist = xr.concat([predict_parallel_resid(gan, unet,
                                    stacked_X.sel( GCM =gcm).transpose('time','lat','lon','channel').sel(time = historical_period).values,
-                                   output_shape.sel(time = historical_period), 64, orog.values, he.values, vegt.values, model_type='GAN') for i in range(10)],
+                                   output_shape.sel(time = historical_period), 64, orog.values, he.values, vegt.values, model_type='GAN', output_add_factor = output_norm) for i in range(5)],
                             dim ="member")
     output_hist_reg = xr.concat([predict_parallel_resid(gan, unet,
                                    stacked_X.sel( GCM =gcm).transpose('time','lat','lon','channel').sel(time = historical_period).values,
-                                   output_shape.sel(time = historical_period), 64, orog.values, he.values, vegt.values, model_type='UNET') for i in range(1)],
+                                   output_shape.sel(time = historical_period), 64, orog.values, he.values, vegt.values, model_type='UNET', output_add_factor = output_norm) for i in range(1)],
                             dim ="member")
 
     output_future = xr.concat([predict_parallel_resid(gan, unet,
                                          stacked_X.sel(GCM=gcm).transpose('time', 'lat', 'lon', 'channel').sel(
                                              time=future_period).values,
                                          output_shape.sel(time=future_period), 64, orog.values, he.values,
-                                         vegt.values, model_type='GAN') for i in range(10)], dim ="member")
+                                         vegt.values, model_type='GAN', output_add_factor = output_norm) for i in range(5)], dim ="member")
     output_future_reg = xr.concat([predict_parallel_resid(gan, unet,
                                          stacked_X.sel(GCM=gcm).transpose('time', 'lat', 'lon', 'channel').sel(
                                              time=future_period).values,
                                          output_shape.sel(time=future_period), 64, orog.values, he.values,
-                                         vegt.values, model_type='UNET') for i in range(1)], dim ="member")
+                                         vegt.values, model_type='UNET', output_add_factor = output_norm) for i in range(1)], dim ="member")
+    
+    output_future2 = xr.concat([predict_parallel_resid(gan, unet,
+                                         stacked_X.sel(GCM=gcm).transpose('time', 'lat', 'lon', 'channel').sel(
+                                             time=future_period2).values,
+                                         output_shape.sel(time=future_period2), 64, orog.values, he.values,
+                                         vegt.values, model_type='GAN', output_add_factor = output_norm) for i in range(5)], dim ="member")
+    output_future_reg2 = xr.concat([predict_parallel_resid(gan, unet,
+                                         stacked_X.sel(GCM=gcm).transpose('time', 'lat', 'lon', 'channel').sel(
+                                             time=future_period2).values,
+                                         output_shape.sel(time=future_period2), 64, orog.values, he.values,
+                                         vegt.values, model_type='UNET', output_add_factor = output_norm) for i in range(1)], dim ="member")
     outputs = xr.concat([output_hist, output_future], dim ="time")
     outputs_reg = xr.concat([output_hist_reg, output_future_reg], dim="time")
     outputs_test = outputs.sel(time = slice("2098","2099"))
     outputs_reg_test = outputs_reg.sel(time=slice("2098", "2099"))
     outputs = compute_signal(outputs[['pr']], quantiles, historical_period, future_period)
     outputs_reg = compute_signal(outputs_reg[['pr']], quantiles, historical_period, future_period)
+    
+    outputs2 = xr.concat([output_hist, output_future2], dim ="time")
+    outputs_reg2 = xr.concat([output_hist_reg, output_future_reg2], dim="time")
+    outputs2 = compute_signal(outputs2[['pr']], quantiles, historical_period, future_period2)
+    outputs_reg2 = compute_signal(outputs_reg2[['pr']], quantiles, historical_period, future_period2)
+    
     #outputs.attrs['title'] = outputs.attrs['title'] + f'   /n ML Emulated NIWA-REMS GAN v1 GCM: {gcm}'
     if not os.path.exists(f'./outputs/{config["model_name"]}'):
         os.makedirs(f'./outputs/{config["model_name"]}')
-    outputs.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_ens.nc')
-    outputs_reg.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_unet.nc')
-    outputs_test.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_ens_test_sample.nc')
-    outputs_reg_test.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_unet_test_sample.nc')
+    outputs.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_ens_v2.nc')
+    outputs_reg.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_unet_v2.nc')
+    outputs2.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_ens_mid_century_v2.nc')
+    outputs_reg2.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_unet_mid_century_v2.nc')
+    outputs_test.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_ens_test_sample_v2.nc')
+    outputs_reg_test.to_netcdf(f'./outputs/{config["model_name"]}/CCAM_NIWA-REMS_{gcm}_hist_ssp370_pr_unet_test_sample_v2.nc')
     with open(f'./outputs/{config["model_name"]}/config_info.json', 'w') as f:
         json.dump(config, f)

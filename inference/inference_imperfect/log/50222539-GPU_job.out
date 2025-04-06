@@ -1,0 +1,7 @@
+Have a good day, Laura!
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) XALT/minimal   2) slurm   3) NeSI
+processing data from /nesi/nobackup/niwa00018/morrishdg/Downscaled_Preprocessed/ScenarioMIP/CSIRO-ARCCSS/ACCESS-CM2/ssp370/r4i1p1f1/day/ScenarioMIP_CSIRO-ARCCSS_ACCESS-CM2_ssp370_r4i1p1f1_day*.nc to 
+slurmstepd: error: *** JOB 50222539 ON wmg102 CANCELLED AT 2025-01-22T17:04:47 ***

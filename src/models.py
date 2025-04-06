@@ -313,10 +313,10 @@ def res_linear_activation_v2_noise(input_size, resize_output, num_filters, kerne
     x = res_block_initial(x, [num_filters[3]*2], 3, [1, 1], f"noise_blockererere", sym_padding=True)
     # decode
     x = up_block(x, temp3, kernel_size=3, filters = num_filters[3], i =0, sym_padding=False)
+
+    x = up_block(x, temp2, kernel_size=5, filters = num_filters[2], i =2, sym_padding=False)
     noise2 = tf.keras.layers.Input(shape=[x.shape[1], x.shape[2], int(num_channels//2)])
     x = tf.keras.layers.Concatenate(-1)([noise2, x])
-    x = up_block(x, temp2, kernel_size=5, filters = num_filters[2], i =2, sym_padding=False)
-
     x = up_block(x, temp1, kernel_size=3, filters = num_filters[1], i =3, sym_padding=False)
     output = tf.image.resize(x, (resize_output[0], resize_output[1]),
                     method=tf.image.ResizeMethod.BILINEAR)

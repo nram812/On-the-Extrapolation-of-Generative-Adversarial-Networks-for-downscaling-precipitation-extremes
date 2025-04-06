@@ -1,0 +1,10 @@
+Have a good day, Laura!
+The following modules were not unloaded:
+  (Use "module --force purge" to unload all):
+
+  1) XALT/minimal   2) slurm   3) NeSI
+processing data from /nesi/nobackup/niwa00018/morrishdg/Downscaled_Preprocessed/CMIP/CSIRO-ARCCSS/ACCESS-CM2/historical/r4i1p1f1/day/CMIP_CSIRO-ARCCSS_ACCESS-CM2_historical_r4i1p1f1_day*.nc to 
+2025-01-22 22:04:49.708718: I tensorflow/core/platform/cpu_feature_guard.cc:182] This TensorFlow binary is optimized to use available CPU instructions in performance-critical operations.
+To enable the following instructions: AVX2 FMA, in other operations, rebuild TensorFlow with the appropriate compiler flags.
+2025-01-22 22:04:51.369417: W tensorflow/compiler/tf2tensorrt/utils/py_utils.cc:38] TF-TRT Warning: Could not find TensorRT
+slurmstepd: error: *** JOB 50222540 ON wmg101 CANCELLED AT 2025-01-22T22:04:51 ***
